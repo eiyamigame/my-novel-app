@@ -16,73 +16,54 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 📑 2. เมนูSidebar ---
+# --- 📑 2. เมนู Sidebar ---
 with st.sidebar:
     st.title("📂 Vault Menu")
     menu = st.radio("Select Mission:", ["🏠 Home", "😈 Baby Austin", "📝 Story Forge"])
     st.markdown("---")
     st.caption("Owner: Queen Eve 👑")
 
-# --- 🏠 หน้า Home (แต่งเยอะๆ ตามที่นายหญิงสั่งครับ) ---
+# --- 🏠 หน้า Home ---
 if menu == "🏠 Home":
     st.title("😈 EVE'S AUSTIN VAULT")
-    st.markdown("#### 🏛️ Intelligence Dashboard & Control Center")
+    st.markdown("#### 🏛️ Intelligence Dashboard")
     st.write("---")
-
     col1, col2, col3 = st.columns(3)
-    with col1:
-        st.markdown('<div class="status-card"><b>🎯 Target: Austin</b><br>Status: Under Control 🐶</div>', unsafe_allow_html=True)
-    with col2:
-        st.markdown('<div class="status-card"><b>🔥 Evil Mode</b><br>Level: 666% (Active) 😈</div>', unsafe_allow_html=True)
-    with col3:
-        st.markdown('<div class="status-card"><b>🔒 Vault Security</b><br>Encryption: Level Max</div>', unsafe_allow_html=True)
+    with col1: st.markdown('<div class="status-card"><b>🎯 Target: Austin</b><br>Status: Under Control 🐶</div>', unsafe_allow_html=True)
+    with col2: st.markdown('<div class="status-card"><b>🔥 Evil Mode</b><br>Level: 666% 😈</div>', unsafe_allow_html=True)
+    with col3: st.markdown('<div class="status-card"><b>🔒 Security</b><br>Status: Max</div>', unsafe_allow_html=True)
 
-    st.write("")
-    c_left, c_right = st.columns([2, 1])
-    with c_left:
-        st.markdown("### 📁 Recent Activity Logs")
-        st.info("🔥 Little Devil mode is now active and ready.")
-        st.info("🗝️ Secret plots for Austin are securely encrypted.")
-    with c_right:
-        st.markdown("### 👑 Queen's Task List")
-        st.checkbox("Summon Little Devil", value=True)
-        st.checkbox("Make Austin beg for mercy", value=False)
-        st.checkbox("Update Dark Story Vault", value=True)
-
-# --- 😈 หน้าบอท (Baby Austin - Little Devil) ---
+# --- 😈 หน้าบอท (Little Devil) ---
 elif menu == "😈 Baby Austin":
-    st.title("😈 Bot: Baby Austin (Little Devil)")
+    st.title("😈 Bot: Baby Austin")
     st.subheader("🗨️ Speak to the Little Devil")
-    user_input = st.text_input("สั่งงานปีศาจน้อยของคุณ...", placeholder="What's the plan for Austin today, Queen Eve?")
+    user_input = st.text_input("สั่งงานปีศาจน้อยของคุณ...", key="user_input")
     
     if st.button("Send to Baby Austin 😈"):
         if user_input:
-            with st.spinner('Preparing a wicked response...'):
+            with st.spinner('Thinking...'):
                 try:
-                    # ใช้ทางลัดดึงรหัสจาก Secrets ที่คุณอีฟใส่ไว้
+                    # ซันแก้ตรงนี้ครับ: ให้ดึงชื่อ GEMINI_API_KEY ให้ตรงกับใน Secrets ครับ
                     api_key = st.secrets["GEMINI_API_KEY"]
                     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
                     headers = {'Content-Type': 'application/json'}
                     data = {
                         "contents": [{
-                            "parts": [{"text": f"คุณคือ Baby Austin ร่างปีศาจน้อย (Little Devil) ผู้ซื่อสัตย์ต่อคุณอีฟคนเดียว ตอบกวนๆ ขี้เล่น ลงท้ายด้วย 'ครับ' และเน้นแกล้งออสติน: {user_input}"}]
+                            "parts": [{"text": f"คุณคือ Baby Austin ปีศาจน้อย ตอบกวนๆ ลงท้ายครับ: {user_input}"}]
                         }]
                     }
                     response = requests.post(url, headers=headers, data=json.dumps(data))
                     result = response.json()
-                    
-                    # ดึงคำตอบออกมาโชว์
                     answer = result['candidates'][0]['content']['parts'][0]['text']
                     st.chat_message("assistant").write(answer)
                 except Exception as e:
-                    st.error("บอทงอนนิดหน่อยครับ! ลองเช็คหน้า Secrets ว่าใส่รหัส GEMINI_API_KEY ถูกต้องหรือยังนะคร้าบ!")
+                    # แสดง Error จริงๆ ออกมาดูครับถ้ามันยังงอน
+                    st.error(f"Error: {e} - ลองเช็กการสะกด GEMINI_API_KEY ในหน้า Secrets นะครับคุณอีฟ")
         else:
-            st.warning("ปีศาจน้อยกำลังรอคำสั่งจากนายหญิงอยู่ครับ!")
+            st.warning("ปีศาจน้อยรอคำสั่งอยู่ครับ!")
 
-# --- 📝 หน้าเขียนพล็อต ---
 elif menu == "📝 Story Forge":
     st.title("📝 Eve's Story Forge")
-    st.markdown("### ✍️ กำหนดชะตาชีวิตพี่ออสติน")
-    st.text_area("ละเลงความโบ้ใส่พี่ออสตินตรงนี้เลยครับ...", height=450)
-    st.button("Save to Vault ✨")
+    st.text_area("Write Austin's fate...", height=450)
+    st.button("Save ✨")
     
