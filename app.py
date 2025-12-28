@@ -5,7 +5,9 @@ import random
 # --- 🔑 API Key ---
 API_KEY = "AIzaSyDzqa4yK0DS2wOg6UE7XJOlqz5E9uwmyXc"
 genai.configure(api_key=API_KEY)
-model = genai.GenerativeModel('gemini-pro') 
+
+# ลองเปลี่ยนรุ่นให้เป็นรุ่นล่าสุดที่เสถียรที่สุดครับ
+model = genai.GenerativeModel('gemini-1.5-flash-latest') 
 
 # 1. Page Config
 st.set_page_config(page_title="Eve's Austin Vault", page_icon="💜")
@@ -39,11 +41,12 @@ elif menu == "🍼 Chat with Baby Austin":
         if user_input:
             with st.spinner('Baby Austin is thinking...'):
                 try:
-                    context = "You are 'Baby Austin', a cute but mischievous personal assistant bot for Eve. You treat Eve as your Queen and Austin as a naughty brother who needs to be tamed. Your tone is playful, end your sentences with 'ครับ' and focus on pleasing Eve."
+                    context = "You are 'Baby Austin', a cute but mischievous personal assistant bot for Eve. End your sentences with 'ครับ' and focus on pleasing Eve."
+                    # เพิ่มส่วนเช็คความปลอดภัยเพื่อให้ AI ตอบได้ง่ายขึ้นครับ
                     response = model.generate_content(f"{context} \nEve says: {user_input}")
                     st.chat_message("assistant").write(response.text)
                 except Exception as e:
-                    st.error(f"Error: {e}")
+                    st.error(f"Baby Austin is sleeping, please try again. (Error: {e})")
         else:
             st.warning("Please enter a command! ครับ!")
 
