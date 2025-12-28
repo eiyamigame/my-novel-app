@@ -1,64 +1,82 @@
 import streamlit as st
 import google.generativeai as genai
 
-# --- 🔑 API Key ---
-API_KEY = "AIzaSyCnOhJN_CIrAvTINGs4xxkg4YbxBNI3XWw"
-genai.configure(api_key=API_KEY)
+# --- 🔑 1. เชื่อมต่อรหัสลับ (ดึงจากช่อง Secrets ที่คุณอีฟใส่ไว้) ---
+if "GEMINI_API_KEY" in st.secrets:
+    API_KEY = st.secrets["GEMINI_API_KEY"]
+    genai.configure(api_key=API_KEY)
+    model = genai.GenerativeModel('gemini-1.5-flash')
+else:
+    st.error("หา API Key ไม่เจอครับคุณอีฟ! ลองเช็คในช่อง Secrets อีกทีนะคร้าบ")
 
-# แก้ไขตรงนี้: ล็อกโมเดลให้เป็นรุ่น 'gemini-1.5-flash' แบบระบุตัวตนชัดเจนครับ
-model = genai.GenerativeModel('models/gemini-1.5-flash') 
-
-# 1. Page Config (แต่งเยอะๆ ตามสั่งครับ)
+# --- 🎨 2. ตั้งค่าหน้าตาแอป (Layout & Style) ---
 st.set_page_config(page_title="Eve's Austin Vault", page_icon="😈", layout="wide")
 
-# 2. CSS Styles (ม่วง-ดำ สุดเท่)
 st.markdown("""
     <style>
     .stApp { background-color: #0b0b0b; color: #bf94ff; }
     [data-testid="stSidebar"] { background-color: #050505; border-right: 1px solid #3c096c; }
-    .stButton>button { background-color: #7b2cbf; color: white; border-radius: 20px; font-weight: bold; border: none; width: 100%; box-shadow: 0 4px 15px rgba(123, 44, 191, 0.4); }
-    .stButton>button:hover { background-color: #9d4edd; box-shadow: 0 0 20px #9d4edd; }
-    h1, h2, h3 { color: #9d4edd !important; text-shadow: 2px 2px 5px #000000; }
+    .stButton>button { background-color: #7b2cbf; color: white; border-radius: 20px; font-weight: bold; border: none; width: 100%; transition: 0.3s; box-shadow: 0 4px 15px rgba(123, 44, 191, 0.4); }
+    .stButton>button:hover { background-color: #9d4edd; box-shadow: 0 0 20px #9d4edd; transform: scale(1.02); }
+    h1, h2, h3 { color: #9d4edd !important; text-shadow: 2px 2px 5px #000000; font-family: 'Courier New', monospace; }
     .status-card { background-color: #1a1a1a; padding: 25px; border-radius: 15px; border-left: 8px solid #7b2cbf; margin-bottom: 15px; border: 1px solid #3c096c; }
     </style>
     """, unsafe_allow_html=True)
 
-# 📑 Sidebar Menu
+# --- 📑 3. เมนูคำสั่ง (Sidebar) ---
 with st.sidebar:
     st.title("📂 Vault Menu")
-    menu = st.radio("Select Mission:", ["🏠 Home", "😈 Baby Austin (Little Devil)", "📝 Story Forge"])
+    menu = st.radio("Select Mission:", ["🏠 Home", "😈 Baby Austin", "📝 Story Forge"])
     st.markdown("---")
-    st.caption("Queen Eve 👑")
+    st.caption("Owner: Queen Eve 👑")
 
+# --- 🏠 หน้า Home (แต่งเยอะๆ ไม่ให้โล่งครับ) ---
 if menu == "🏠 Home":
     st.title("😈 EVE'S AUSTIN VAULT")
-    st.markdown("#### 🏛️ Intelligence Dashboard")
+    st.markdown("#### 🏛️ Intelligence Dashboard & Control Center")
     st.write("---")
-    
-    # ส่วน Dashboard แต่งเยอะๆ (หน้าจะได้ไม่โล่งครับ)
+
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.markdown('<div class="status-card"><b>🎯 Target: Austin</b><br>Status: Under Eve\'s Control 🐶</div>', unsafe_allow_html=True)
+        st.markdown('<div class="status-card"><b>🎯 Target: Austin</b><br>Status: Under Control 🐶</div>', unsafe_allow_html=True)
     with col2:
-        st.markdown('<div class="status-card"><b>🔥 Evil Power</b><br>Level: 666% (Maximum) 😈</div>', unsafe_allow_html=True)
+        st.markdown('<div class="status-card"><b>🔥 Evil Mode</b><br>Level: 666% (Active) 😈</div>', unsafe_allow_html=True)
     with col3:
-        st.markdown('<div class="status-card"><b>🔒 Security</b><br>Status: Maximum Protection</div>', unsafe_allow_html=True)
+        st.markdown('<div class="status-card"><b>🔒 Vault Security</b><br>Encryption: Level Max</div>', unsafe_allow_html=True)
 
-elif menu == "😈 Baby Austin (Little Devil)":
-    st.title("😈 Bot: Baby Austin")
-    user_input = st.text_input("สั่งงานปีศาจน้อยของคุณ...", placeholder="What's the plan for Austin today?")
+    st.write("")
+    c_left, c_right = st.columns([2, 1])
+    with c_left:
+        st.markdown("### 📁 Recent Logs")
+        st.info("🔥 Little Devil mode is fully functional.")
+        st.info("🗝️ All Austin's secrets are securely stored.")
+    with c_right:
+        st.markdown("### 👑 Queen's Task List")
+        st.checkbox("Summon Little Devil", value=True)
+        st.checkbox("Make Austin beg", value=False)
+        st.checkbox("Update Secret Vault", value=True)
+
+# --- 😈 หน้าคุยกับบอท (Little Devil) ---
+elif menu == "😈 Baby Austin":
+    st.title("😈 Bot: Baby Austin (Little Devil)")
+    st.subheader("🗨️ Speak to the Little Devil")
+    user_input = st.text_input("สั่งงานปีศาจน้อยของคุณ...", placeholder="What should we do with Austin today?")
+    
     if st.button("Send to Baby Austin 😈"):
         if user_input:
-            with st.spinner('Preparing response...'):
+            with st.spinner('Thinking...'):
                 try:
-                    context = "คุณคือ 'Baby Austin' ร่างปีศาจน้อย (Little Devil) ผู้ช่วยของคุณอีฟ ตอบกวนๆ ขี้เล่น ลงท้ายด้วย 'ครับ' และภักดีต่อคุณอีฟคนเดียว"
+                    context = "คุณคือ 'Baby Austin' ปีศาจน้อยผู้ซื่อสัตย์ต่อคุณอีฟคนเดียว ตอบกวนๆ ขี้เล่น ลงท้ายด้วย 'ครับ' และเน้นแกล้งออสติน"
                     response = model.generate_content(f"{context} \nคุณอีฟสั่งว่า: {user_input}")
                     st.chat_message("assistant").write(response.text)
                 except Exception as e:
-                    st.error(f"Baby Austin Error: {e} - ลองกด Manage app > Reboot app นะครับคุณอีฟ")
+                    st.error(f"Error: {e} - ลองกด Reboot app ดูนะครับ")
+        else:
+            st.warning("ปีศาจน้อยรอคำสั่งอยู่ครับ!")
 
+# --- 📝 หน้าเขียนพล็อต ---
 elif menu == "📝 Story Forge":
     st.title("📝 Eve's Story Forge")
-    st.text_area("Write down Austin's fate here...", height=450)
+    st.text_area("ละเลงความโบ้ใส่พี่ออสตินตรงนี้เลยครับ...", height=450)
     st.button("Save to Vault ✨")
     
