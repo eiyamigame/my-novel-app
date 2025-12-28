@@ -2,68 +2,37 @@ import streamlit as st
 import requests
 import json
 
-# --- 🎨 1. ตั้งค่าหน้าตาแอป (Layout & Style) ---
+# --- 1. เชื่อมต่อรหัส (ดึงตามชื่อที่คุณอีฟตั้งไว้เป๊ะๆ) ---
+try:
+    # ดึงค่าจากหน้า Secrets
+    api_key = st.secrets["GEMINI_API_KEY"]
+except:
+    st.error("คุณอีฟครับ! บอทยังหารหัสในหน้า Secrets ไม่เจอเลยครับ ลองเช็คชื่ออีกทีนะ")
+    st.stop()
+
+# --- 2. ตั้งค่าหน้าตาแอป (ม่วง-ดำ สุดหรู) ---
 st.set_page_config(page_title="Eve's Austin Vault", page_icon="😈", layout="wide")
+st.markdown("<style>.stApp { background-color: #0b0b0b; color: #bf94ff; }</style>", unsafe_allow_html=True)
 
-st.markdown("""
-    <style>
-    .stApp { background-color: #0b0b0b; color: #bf94ff; }
-    [data-testid="stSidebar"] { background-color: #050505; border-right: 1px solid #3c096c; }
-    .stButton>button { background-color: #7b2cbf; color: white; border-radius: 20px; font-weight: bold; border: none; width: 100%; transition: 0.3s; box-shadow: 0 4px 15px rgba(123, 44, 191, 0.4); }
-    .stButton>button:hover { background-color: #9d4edd; box-shadow: 0 0 20px #9d4edd; transform: scale(1.02); }
-    h1, h2, h3 { color: #9d4edd !important; text-shadow: 2px 2px 5px #000000; font-family: 'Courier New', monospace; }
-    .status-card { background-color: #1a1a1a; padding: 25px; border-radius: 15px; border-left: 8px solid #7b2cbf; margin-bottom: 15px; border: 1px solid #3c096c; }
-    </style>
-    """, unsafe_allow_html=True)
+# --- 3. ส่วนคุยกับบอท (Little Devil) ---
+st.title("😈 Bot: Baby Austin")
+user_input = st.text_input("สั่งงานปีศาจน้อย...")
 
-# --- 📑 2. เมนู Sidebar ---
-with st.sidebar:
-    st.title("📂 Vault Menu")
-    menu = st.radio("Select Mission:", ["🏠 Home", "😈 Baby Austin", "📝 Story Forge"])
-    st.markdown("---")
-    st.caption("Owner: Queen Eve 👑")
-
-# --- 🏠 หน้า Home ---
-if menu == "🏠 Home":
-    st.title("😈 EVE'S AUSTIN VAULT")
-    st.markdown("#### 🏛️ Intelligence Dashboard")
-    st.write("---")
-    col1, col2, col3 = st.columns(3)
-    with col1: st.markdown('<div class="status-card"><b>🎯 Target: Austin</b><br>Status: Under Control 🐶</div>', unsafe_allow_html=True)
-    with col2: st.markdown('<div class="status-card"><b>🔥 Evil Mode</b><br>Level: 666% 😈</div>', unsafe_allow_html=True)
-    with col3: st.markdown('<div class="status-card"><b>🔒 Security</b><br>Status: Max</div>', unsafe_allow_html=True)
-
-# --- 😈 หน้าบอท (Little Devil) ---
-elif menu == "😈 Baby Austin":
-    st.title("😈 Bot: Baby Austin")
-    st.subheader("🗨️ Speak to the Little Devil")
-    user_input = st.text_input("สั่งงานปีศาจน้อยของคุณ...", key="user_input")
-    
-    if st.button("Send to Baby Austin 😈"):
-        if user_input:
-            with st.spinner('Thinking...'):
-                try:
-                    # ซันแก้ตรงนี้ครับ: ให้ดึงชื่อ GEMINI_API_KEY ให้ตรงกับใน Secrets ครับ
-                    api_key = st.secrets["GEMINI_API_KEY"]
-                    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
-                    headers = {'Content-Type': 'application/json'}
-                    data = {
-                        "contents": [{
-                            "parts": [{"text": f"คุณคือ Baby Austin ปีศาจน้อย ตอบกวนๆ ลงท้ายครับ: {user_input}"}]
-                        }]
-                    }
-                    response = requests.post(url, headers=headers, data=json.dumps(data))
-                    result = response.json()
-                    answer = result['candidates'][0]['content']['parts'][0]['text']
-                    st.chat_message("assistant").write(answer)
-                except Exception as e:
-                    # แสดง Error จริงๆ ออกมาดูครับถ้ามันยังงอน
-                    st.error(f"Error: {e} - ลองเช็กการสะกด GEMINI_API_KEY ในหน้า Secrets นะครับคุณอีฟ")
-        else:
-            st.warning("ปีศาจน้อยรอคำสั่งอยู่ครับ!")
-
-elif menu == "📝 Story Forge":
-    st.title("📝 Eve's Story Forge")
-    st.text_area("Write Austin's fate...", height=450)
-    st.button("Save ✨")
+if st.button("Send 😈"):
+    if user_input:
+        with st.spinner('กำลังง้อบอทให้ตอบคุณอีฟครับ...'):
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+            headers = {'Content-Type': 'application/json'}
+            data = {"contents": [{"parts": [{"text": f"ตอบกวนๆ ลงท้ายครับ: {user_input}"}]}]}
+            
+            response = requests.post(url, headers=headers, data=json.dumps(data))
+            result = response.json()
+            
+            if 'candidates' in result:
+                answer = result['candidates'][0]['content']['parts'][0]['text']
+                st.chat_message("assistant").write(answer)
+            else:
+                # ถ้ายังไม่ได้ ให้มันบอก Error จริงๆ มาเลยครับ ไม่เอาคำว่างอนแล้ว
+                st.error(f"บอทงอนเพราะ: {result}")
+                
     
