@@ -2,57 +2,60 @@ import streamlit as st
 import google.generativeai as genai
 import random
 
-# --- 🔑 API Key ของคุณอีฟ ---
+# --- 🔑 API Key ---
 API_KEY = "AIzaSyDzqa4yK0DS2wOg6UE7XJOlqz5E9uwmyXc"
 genai.configure(api_key=API_KEY)
-model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel('gemini-pro') 
 
-# 1. ตั้งค่าหน้าแอป
+# 1. Page Config
 st.set_page_config(page_title="Eve's Austin Vault", page_icon="💜")
 
-# 2. ธีมม่วง-ดำ และ CSS สวยๆ
+# 2. CSS Styles (Purple & Black)
 st.markdown("""
     <style>
     .stApp { background-color: #0b0b0b; color: #bf94ff; }
-    .stButton>button { background-color: #7b2cbf; color: white; border-radius: 15px; width: 100%; font-weight: bold; border: none; }
+    .stButton>button { background-color: #7b2cbf; color: white; border-radius: 20px; font-weight: bold; border: none; width: 100%; }
     h1, h2, h3 { color: #9d4edd !important; text-shadow: 2px 2px 4px #000000; }
     .stTextInput>div>div>input, .stTextArea>div>div>textarea { background-color: #1a1a1a; color: #bf94ff; border: 1px solid #7b2cbf; }
     [data-testid="stSidebar"] { background-color: #050505; border-right: 1px solid #3c096c; }
     </style>
     """, unsafe_allow_html=True)
 
-# 📑 เมนู Sidebar
+# 📑 Sidebar Menu
 with st.sidebar:
-    st.title("📂 Main Menu")
-    menu = st.radio("เลือกภารกิจ:", ["🏠 หน้าหลัก (The Vault)", "🍼 คุยกับเบบี้ออสติน", "🎲 สุ่มพล็อตแก้ตัน", "📝 ห้องปั่นนิยาย"])
+    st.title("📂 Vault Menu")
+    menu = st.radio("Select Mission:", ["🏠 Home", "🍼 Chat with Baby Austin", "🎲 Random Plot", "📝 Story Forge"])
 
-if menu == "🏠 หน้าหลัก (The Vault)":
-    # --- 📸 โชว์รูปหน้าปกที่คุณอีฟชอบ ---
-    st.image("https://r2.erweima.ai/i/0_IovDNoQvub9YvI417Mow.png", use_container_width=True)
+if menu == "🏠 Home":
     st.title("📂 Eve's Austin Vault")
-    st.write("ยินดีต้อนรับสู่คลังลับของคุณอีฟ! ทุกความลับของพี่ออสตินถูกเก็บไว้ที่นี่แล้วครับ! ครับ!")
+    st.write("Welcome to the secret vault, My Lady Eve! Everything is ready for you. ครับ!")
 
-elif menu == "🍼 คุยกับเบบี้ออสติน":
-    st.title("🍼 บอท: เบบี้ออสติน")
-    user_input = st.text_input("สั่งงานเบบี้ออสติน...")
-    if st.button("ส่งคำสั่งให้เบบี้ 💜"):
+elif menu == "🍼 Chat with Baby Austin":
+    st.title("🍼 Bot: Baby Austin")
+    st.subheader("🗨️ Baby Austin's Command Center")
+    user_input = st.text_input("Message Baby Austin...", placeholder="Type your command here...")
+    
+    if st.button("Send to Baby Austin 💜"):
         if user_input:
-            with st.spinner('กำลังคิดให้ครับ...'):
-                context = "คุณคือ 'เบบี้ออสติน' บอทผู้ช่วยส่วนตัวของคุณอีฟ ตอบแบบขี้เล่น กวนนิดๆ ลงท้ายด้วย 'ครับ' และเน้นแกล้งออสตินให้โบ้ที่สุด"
-                prompt = f"{context} \nคุณอีฟสั่งว่า: {user_input}"
-                response = model.generate_content(prompt)
-                st.chat_message("assistant").write(response.text)
+            with st.spinner('Baby Austin is thinking...'):
+                try:
+                    context = "You are 'Baby Austin', a cute but mischievous personal assistant bot for Eve. You treat Eve as your Queen and Austin as a naughty brother who needs to be tamed. Your tone is playful, end your sentences with 'ครับ' and focus on pleasing Eve."
+                    response = model.generate_content(f"{context} \nEve says: {user_input}")
+                    st.chat_message("assistant").write(response.text)
+                except Exception as e:
+                    st.error(f"Error: {e}")
+        else:
+            st.warning("Please enter a command! ครับ!")
 
-elif menu == "🎲 สุ่มพล็อตแก้ตัน":
-    st.title("🎲 สุ่มพล็อต")
-    if st.button("✨ กดสุ่มพล็อตใหม่!"):
-        plots = ["พี่ออสตินโดนจับมัด!", "นางเอกแกล้งลืมพี่ออสติน", "พี่ออสตินต้องเป็นทาสรับใช้ 1 วัน"]
+elif menu == "🎲 Random Plot":
+    st.title("🎲 Plot Generator")
+    if st.button("✨ Spin New Plot!"):
+        plots = ["Austin gets tied up!", "Eve pretends to forget Austin.", "Austin must be a slave for a day."]
         st.info(random.choice(plots))
         st.balloons()
 
-elif menu == "📝 ห้องปั่นนิยาย":
-    st.title("📝 ปั่นนิยาย")
-    st.text_area("ละเลงความโบ้ตรงนี้เลยครับ...", height=400)
-    st.button("บันทึกเนื้อหา ✨")
-    
+elif menu == "📝 Story Forge":
+    st.title("📝 Eve's Story Forge")
+    st.text_area("Write down Austin's fate here...", height=400)
+    st.button("Save to Vault ✨")
     
